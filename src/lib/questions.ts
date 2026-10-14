@@ -1,4 +1,5 @@
 import type { SubjectId } from "./game";
+import { EXTRA } from "./bank";
 
 export interface Question { id: string; q: string; a: string; options?: string[]; topic: string; d: number }
 
@@ -8,6 +9,7 @@ const shuffle = <T,>(x: T[]) => [...x].sort(() => Math.random() - 0.5);
 // [subject, topic, difficulty 0-3, question, answer, options | null]
 type Row = [SubjectId, string, number, string, string, string[] | null];
 const BANK: Row[] = [
+  ...EXTRA,
   ["science", "Biology", 0, "What do plants take in from the air to make food?", "Carbon dioxide", ["Oxygen", "Carbon dioxide", "Nitrogen", "Helium"]],
   ["science", "Chemistry", 1, "What is the chemical symbol for water?", "H2O", null],
   ["science", "Physics", 1, "What force pulls objects toward Earth?", "Gravity", ["Gravity", "Magnetism", "Friction", "Sound"]],

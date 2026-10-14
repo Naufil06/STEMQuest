@@ -23,13 +23,13 @@ export interface GameState {
   runs: Record<SubjectId, { ok: number; bad: number }>;
   subjects: Record<SubjectId, Stat>;
   topics: Record<string, Stat>;
-  unlockedWorlds: number[]; owned: string[];
+  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>;
 }
 const initial = (): GameState => ({
   xp: 0, coins: 0, streak: 0, lastDay: "",
   settings: { largeText: false, highContrast: false, dyslexia: false },
   difficulty: bySubject(() => 0), runs: bySubject(() => ({ ok: 0, bad: 0 })),
-  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [],
+  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: { character: "explorer" },
 });
 
 const KEY = "stemquest-v1";
@@ -39,7 +39,7 @@ function load(): GameState {
 }
 let state = load();
 const subs = new Set<() => void>();
-function set(fn: (s: GameState) => GameState) {
+export function set(fn: (s: GameState) => GameState) {
   state = fn(state);
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignore */ }
   subs.forEach((f) => f());

@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as WorldMapRouteImport } from './routes/world-map'
 import { Route as SubjectsIndexRouteImport } from './routes/subjects.index'
 import { Route as SubjectsSubjectRouteImport } from './routes/subjects.$subject'
 
@@ -19,9 +21,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RewardsRoute = RewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorldMapRoute = WorldMapRouteImport.update({
+  id: '/world-map',
+  path: '/world-map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubjectsIndexRoute = SubjectsIndexRouteImport.update({
@@ -37,34 +49,61 @@ const SubjectsSubjectRoute = SubjectsSubjectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/world-map': typeof WorldMapRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects/': typeof SubjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/world-map': typeof WorldMapRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects': typeof SubjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/world-map': typeof WorldMapRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects/': typeof SubjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/settings' | '/subjects/$subject' | '/subjects/'
+  fullPaths:
+    | '/'
+    | '/rewards'
+    | '/settings'
+    | '/world-map'
+    | '/subjects/$subject'
+    | '/subjects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/settings' | '/subjects/$subject' | '/subjects'
-  id: '__root__' | '/' | '/settings' | '/subjects/$subject' | '/subjects/'
+  to:
+    | '/'
+    | '/rewards'
+    | '/settings'
+    | '/world-map'
+    | '/subjects/$subject'
+    | '/subjects'
+  id:
+    | '__root__'
+    | '/'
+    | '/rewards'
+    | '/settings'
+    | '/world-map'
+    | '/subjects/$subject'
+    | '/subjects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RewardsRoute: typeof RewardsRoute
   SettingsRoute: typeof SettingsRoute
+  WorldMapRoute: typeof WorldMapRoute
   SubjectsSubjectRoute: typeof SubjectsSubjectRoute
   SubjectsIndexRoute: typeof SubjectsIndexRoute
 }
@@ -78,11 +117,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rewards': {
+      id: '/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof RewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/world-map': {
+      id: '/world-map'
+      path: '/world-map'
+      fullPath: '/world-map'
+      preLoaderRoute: typeof WorldMapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/subjects/': {
@@ -104,7 +157,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RewardsRoute: RewardsRoute,
   SettingsRoute: SettingsRoute,
+  WorldMapRoute: WorldMapRoute,
   SubjectsSubjectRoute: SubjectsSubjectRoute,
   SubjectsIndexRoute: SubjectsIndexRoute,
 }

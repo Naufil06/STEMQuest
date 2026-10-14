@@ -3,6 +3,7 @@ import { useGame, levelInfo, rankFor, accuracy, SUBJECTS } from "@/lib/game";
 import { useT } from "@/lib/i18n";
 import { seo } from "@/lib/seo";
 import { Bar, Card } from "@/components/ui-game";
+import { Avatar } from "@/components/Avatar";
 
 export const Route = createFileRoute("/")({ head: () => seo("Dashboard", "Your STEMQuest adventure."), component: Dashboard });
 
@@ -27,7 +28,7 @@ function Dashboard() {
         </div>
         <div className="mt-6 flex justify-between text-sm"><span>{t("xp")}</span><span>{lv.into} / {lv.need}</span></div>
         <div className="h-4 overflow-hidden rounded-full bg-background/30"><div className="bar-grow h-full bg-coin-grad" style={{ width: `${lv.pct}%` }} /></div>
-        <span className="animate-float absolute -top-2 end-8 hidden text-[9rem] md:block" aria-hidden>🧭</span>
+        <div className="animate-float absolute end-10 top-4 hidden md:block"><Avatar /></div>
       </section>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {stats.map(([i, v, l]) => (
