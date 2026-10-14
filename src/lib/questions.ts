@@ -1,5 +1,6 @@
 import type { SubjectId } from "./game";
 import { EXTRA } from "./bank";
+import { mathQuestion } from "./math";
 
 export interface Question { id: string; q: string; a: string; options?: string[]; topic: string; d: number }
 
@@ -30,28 +31,8 @@ const BANK: Row[] = [
   ["technology", "Coding Basics", 1, "Which symbol starts a comment in Python?", "#", null],
 ];
 
-function mathQ(topic: string | undefined, d: number): Question {
-  const t = topic ?? ["Arithmetic", "Fractions", "Algebra", "Geometry"][r(0, 3)];
-  const m = [10, 20, 60, 200][d];
-  let q = "", a = 0;
-  if (t === "Fractions") { const n = r(2, 4 + d * 2), k = r(2, 6 + d * 4); q = `What is 1/${n} of ${n * k}?`; a = k; }
-  else if (t === "Algebra") { const x = r(1, m), c = r(2, 3 + d * 3), b = r(1, m); q = `Solve for x: ${c}x + ${b} = ${c * x + b}`; a = x; }
-  else if (t === "Geometry") { const w = r(2, m), h = r(2, m); q = `A rectangle is ${w} by ${h}. What is its area?`; a = w * h; }
-  else {
-    const x = r(1, m), y = r(1, m), op = r(0, d === 0 ? 1 : 2);
-    if (op === 0) { q = `${x} + ${y} = ?`; a = x + y; }
-    else if (op === 1) { q = `${x + y} − ${y} = ?`; a = x; }
-    else { const p = r(2, 5 + d * 3); q = `${p} × ${y} = ?`; a = p * y; }
-  }
-  const options = Math.random() < 0.5 ? shuffle([...new Set([a, a + 1, a - 1, a + r(2, 9)])].map(String)) : undefined;
-  return { id: `m-${q}`, q, a: String(a), options, topic: t, d };
-}
-
 export function pickQuestion(sid: SubjectId, d: number, _lang: string, seen: Set<string>, topic?: string): Question {
-  if (sid === "math") {
-    for (let i = 0; i < 20; i++) { const x = mathQ(topic, d); if (!seen.has(x.id)) return x; }
-    return mathQ(topic, d);
-  }
+  if (sid === "math") return mathQuestion(topic, d, seen);
   let pool = BANK.filter((b) => b[0] === sid && (!topic || b[1] === topic));
   if (!pool.length) pool = BANK.filter((b) => b[0] === sid);
   const fresh = pool.filter((b) => !seen.has(`${sid}-${b[3]}`));

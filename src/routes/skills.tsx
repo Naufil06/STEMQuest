@@ -9,7 +9,7 @@ export const Route = createFileRoute("/skills")({ head: () => seo("Skill Trees",
 // A skill is mastered after `need` correct answers in its topics; mastering one unlocks the next.
 type Node = { label: string; topics: string[]; need: number };
 const TREES: { name: string; emoji: string; nodes: Node[] }[] = [
-  { name: "Math Tree", emoji: "🔢", nodes: [{ label: "Arithmetic", topics: ["Arithmetic"], need: 8 }, { label: "Fractions", topics: ["Fractions"], need: 8 }, { label: "Algebra", topics: ["Algebra"], need: 8 }, { label: "Advanced Math", topics: ["Algebra", "Geometry"], need: 16 }] },
+  { name: "Math Tree", emoji: "🔢", nodes: [{ label: "Arithmetic", topics: ["Addition", "Subtraction", "Multiplication", "Division"], need: 16 }, { label: "Fractions", topics: ["Fractions"], need: 8 }, { label: "Algebra", topics: ["Algebra"], need: 4 }, { label: "Advanced Math", topics: ["Algebra", "Geometry"], need: 10 }] },
   { name: "Science Tree", emoji: "🔬", nodes: [{ label: "Biology", topics: ["Biology"], need: 6 }, { label: "Chemistry", topics: ["Chemistry"], need: 6 }, { label: "Physics", topics: ["Physics"], need: 6 }] },
   { name: "English Tree", emoji: "📚", nodes: [{ label: "Grammar", topics: ["Grammar"], need: 6 }, { label: "Reading", topics: ["Reading"], need: 6 }, { label: "Writing", topics: ["Writing"], need: 6 }] },
   { name: "Technology Tree", emoji: "💻", nodes: [{ label: "Coding Basics", topics: ["Coding Basics"], need: 6 }, { label: "Logic", topics: ["Logic"], need: 6 }, { label: "Digital Literacy", topics: ["Digital Literacy"], need: 6 }] },

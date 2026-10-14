@@ -10,10 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FriendsRouteImport } from './routes/friends'
+import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
+import { Route as ParentRouteImport } from './routes/parent'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SkillsRouteImport } from './routes/skills'
+import { Route as TeacherRouteImport } from './routes/teacher'
 import { Route as WorldMapRouteImport } from './routes/world-map'
 import { Route as SubjectsIndexRouteImport } from './routes/subjects.index'
 import { Route as SubjectsSubjectRouteImport } from './routes/subjects.$subject'
@@ -21,6 +25,21 @@ import { Route as SubjectsSubjectRouteImport } from './routes/subjects.$subject'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FriendsRoute = FriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardsRoute = LeaderboardsRouteImport.update({
+  id: '/leaderboards',
+  path: '/leaderboards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParentRoute = ParentRouteImport.update({
+  id: '/parent',
+  path: '/parent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressRoute = ProgressRouteImport.update({
@@ -43,6 +62,11 @@ const SkillsRoute = SkillsRouteImport.update({
   path: '/skills',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherRoute = TeacherRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorldMapRoute = WorldMapRouteImport.update({
   id: '/world-map',
   path: '/world-map',
@@ -61,20 +85,28 @@ const SubjectsSubjectRoute = SubjectsSubjectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/friends': typeof FriendsRoute
+  '/leaderboards': typeof LeaderboardsRoute
+  '/parent': typeof ParentRoute
   '/progress': typeof ProgressRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
   '/skills': typeof SkillsRoute
+  '/teacher': typeof TeacherRoute
   '/world-map': typeof WorldMapRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects/': typeof SubjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/friends': typeof FriendsRoute
+  '/leaderboards': typeof LeaderboardsRoute
+  '/parent': typeof ParentRoute
   '/progress': typeof ProgressRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
   '/skills': typeof SkillsRoute
+  '/teacher': typeof TeacherRoute
   '/world-map': typeof WorldMapRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects': typeof SubjectsIndexRoute
@@ -82,10 +114,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/friends': typeof FriendsRoute
+  '/leaderboards': typeof LeaderboardsRoute
+  '/parent': typeof ParentRoute
   '/progress': typeof ProgressRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
   '/skills': typeof SkillsRoute
+  '/teacher': typeof TeacherRoute
   '/world-map': typeof WorldMapRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects/': typeof SubjectsIndexRoute
@@ -94,30 +130,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/friends'
+    | '/leaderboards'
+    | '/parent'
     | '/progress'
     | '/rewards'
     | '/settings'
     | '/skills'
+    | '/teacher'
     | '/world-map'
     | '/subjects/$subject'
     | '/subjects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/friends'
+    | '/leaderboards'
+    | '/parent'
     | '/progress'
     | '/rewards'
     | '/settings'
     | '/skills'
+    | '/teacher'
     | '/world-map'
     | '/subjects/$subject'
     | '/subjects'
   id:
     | '__root__'
     | '/'
+    | '/friends'
+    | '/leaderboards'
+    | '/parent'
     | '/progress'
     | '/rewards'
     | '/settings'
     | '/skills'
+    | '/teacher'
     | '/world-map'
     | '/subjects/$subject'
     | '/subjects/'
@@ -125,10 +173,14 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FriendsRoute: typeof FriendsRoute
+  LeaderboardsRoute: typeof LeaderboardsRoute
+  ParentRoute: typeof ParentRoute
   ProgressRoute: typeof ProgressRoute
   RewardsRoute: typeof RewardsRoute
   SettingsRoute: typeof SettingsRoute
   SkillsRoute: typeof SkillsRoute
+  TeacherRoute: typeof TeacherRoute
   WorldMapRoute: typeof WorldMapRoute
   SubjectsSubjectRoute: typeof SubjectsSubjectRoute
   SubjectsIndexRoute: typeof SubjectsIndexRoute
@@ -141,6 +193,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/friends': {
+      id: '/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof FriendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboards': {
+      id: '/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/leaderboards'
+      preLoaderRoute: typeof LeaderboardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parent': {
+      id: '/parent'
+      path: '/parent'
+      fullPath: '/parent'
+      preLoaderRoute: typeof ParentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progress': {
@@ -171,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SkillsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher': {
+      id: '/teacher'
+      path: '/teacher'
+      fullPath: '/teacher'
+      preLoaderRoute: typeof TeacherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/world-map': {
       id: '/world-map'
       path: '/world-map'
@@ -197,10 +277,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FriendsRoute: FriendsRoute,
+  LeaderboardsRoute: LeaderboardsRoute,
+  ParentRoute: ParentRoute,
   ProgressRoute: ProgressRoute,
   RewardsRoute: RewardsRoute,
   SettingsRoute: SettingsRoute,
   SkillsRoute: SkillsRoute,
+  TeacherRoute: TeacherRoute,
   WorldMapRoute: WorldMapRoute,
   SubjectsSubjectRoute: SubjectsSubjectRoute,
   SubjectsIndexRoute: SubjectsIndexRoute,
