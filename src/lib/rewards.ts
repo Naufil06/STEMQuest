@@ -1,23 +1,23 @@
 import { set } from "./game";
 
-export type Slot = "character" | "pet" | "hat" | "backpack" | "glasses" | "costume";
-export const SLOTS: { id: Slot; label: string; emoji: string }[] = [
-  { id: "character", label: "Characters", emoji: "🧒" }, { id: "pet", label: "Pets", emoji: "🐾" },
-  { id: "hat", label: "Hats", emoji: "🎩" }, { id: "glasses", label: "Glasses", emoji: "🕶️" },
-  { id: "backpack", label: "Backpacks", emoji: "🎒" }, { id: "costume", label: "Costumes", emoji: "🥼" },
+export type Slot = "character" | "costume" | "hat" | "glasses" | "backpack" | "pet";
+export const SLOTS: { id: Slot; label: string }[] = [
+  { id: "character", label: "Hero" }, { id: "costume", label: "Costumes" }, { id: "hat", label: "Hats" },
+  { id: "glasses", label: "Glasses" }, { id: "backpack", label: "Backpacks" }, { id: "pet", label: "Pets" },
 ];
 export interface Item { id: string; slot: Slot; name: string; emoji: string; price: number }
 const I = (slot: Slot, rows: [string, string, string, number][]): Item[] => rows.map(([id, name, emoji, price]) => ({ id, slot, name, emoji, price }));
+// Costume ids must match the files in public/characters (boy-<id>.png / girl-<id>.png).
 export const ITEMS: Item[] = [
-  ...I("character", [["explorer", "Explorer", "🧒", 0], ["scientist", "Scientist", "🧑‍🔬", 150], ["engineer", "Engineer", "👷", 150], ["astronaut", "Astronaut", "🧑‍🚀", 300], ["inventor", "Inventor", "🧑‍🔧", 200]]),
+  ...I("character", [["boy", "Boy", "", 0], ["girl", "Girl", "", 0]]),
+  ...I("costume", [["school", "School Suit", "", 0], ["labcoat", "Scientist Lab Coat", "", 80], ["engineer", "Engineer Gear", "", 100], ["inventor", "Inventor Overalls", "", 100], ["hero", "Hero Suit", "", 130], ["astronaut", "Astronaut Suit", "", 150]]),
+  ...I("hat", [["cap", "Explorer Cap", "", 40], ["grad", "Grad Cap", "", 60], ["tophat", "Top Hat", "", 80], ["crown", "Crown", "", 200]]),
+  ...I("glasses", [["specs", "Smart Specs", "", 30], ["shades", "Cool Shades", "", 50], ["goggles", "Lab Goggles", "", 70]]),
+  ...I("backpack", [["pack", "Adventure Pack", "", 50], ["chute", "Purple Pack", "", 120]]),
   ...I("pet", [["owl", "Owl", "🦉", 100], ["robotdog", "Robot Dog", "🐕", 150], ["spacecat", "Space Cat", "🐱", 200], ["dragon", "Dragon", "🐉", 350]]),
-  ...I("hat", [["cap", "Explorer Cap", "🧢", 40], ["grad", "Grad Cap", "🎓", 60], ["tophat", "Top Hat", "🎩", 80], ["crown", "Crown", "👑", 200]]),
-  ...I("glasses", [["specs", "Smart Specs", "👓", 30], ["shades", "Cool Shades", "🕶️", 50], ["goggles", "Lab Goggles", "🥽", 70]]),
-  ...I("backpack", [["pack", "Adventure Pack", "🎒", 50], ["chute", "Parachute Pack", "🪂", 120]]),
-  ...I("costume", [["labcoat", "Lab Coat", "🥼", 80], ["vest", "Safety Vest", "🦺", 90], ["cape", "Hero Coat", "🧥", 130]]),
 ];
 export const getItem = (id?: string) => ITEMS.find((i) => i.id === id);
-export const isOwned = (owned: string[], id: string) => id === "explorer" || owned.includes(id);
+export const isOwned = (owned: string[], id: string) => owned.includes(id) || getItem(id)?.price === 0;
 
 export function buy(id: string) {
   const it = getItem(id);

@@ -23,13 +23,13 @@ export interface GameState {
   runs: Record<SubjectId, { ok: number; bad: number }>;
   subjects: Record<SubjectId, Stat>;
   topics: Record<string, Stat>;
-  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>;
+  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>; history: Record<string, { n: number; ok: number; xp: number }>;
 }
 const initial = (): GameState => ({
   xp: 0, coins: 0, streak: 0, lastDay: "",
   settings: { largeText: false, highContrast: false, dyslexia: false },
   difficulty: bySubject(() => 0), runs: bySubject(() => ({ ok: 0, bad: 0 })),
-  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: { character: "explorer" },
+  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: {}, history: {},
 });
 
 const KEY = "stemquest-v1";
@@ -73,8 +73,9 @@ export function recordAnswer(sid: SubjectId, topic: string, d: number, ok: boole
     const bump = (x: Stat = stat()): Stat => ({ answered: x.answered + 1, correct: x.correct + (ok ? 1 : 0) });
     const today = day(), yest = day(new Date(Date.now() - 864e5));
     const streak = s.lastDay === today ? s.streak : s.lastDay === yest ? s.streak + 1 : 1;
+    const h = s.history?.[today] ?? { n: 0, ok: 0, xp: 0 };
     return {
-      ...s, xp: s.xp + xp, coins: s.coins + (ok ? Math.round(xp / 2) : 0), streak, lastDay: today,
+      ...s, history: { ...s.history, [today]: { n: h.n + 1, ok: h.ok + (ok ? 1 : 0), xp: h.xp + xp } }, xp: s.xp + xp, coins: s.coins + (ok ? Math.round(xp / 2) : 0), streak, lastDay: today,
       difficulty: { ...s.difficulty, [sid]: nd }, runs: { ...s.runs, [sid]: run },
       subjects: { ...s.subjects, [sid]: bump(s.subjects[sid]) },
       topics: { ...s.topics, [topic]: bump(s.topics[topic]) },

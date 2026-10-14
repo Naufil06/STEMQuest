@@ -4,12 +4,14 @@ import { useT } from "@/lib/i18n";
 import { seo } from "@/lib/seo";
 import { Bar, Card } from "@/components/ui-game";
 import { Avatar } from "@/components/Avatar";
+import { equip } from "@/lib/rewards";
 
 export const Route = createFileRoute("/")({ head: () => seo("Dashboard", "Your STEMQuest adventure."), component: Dashboard });
 
 function Dashboard() {
   const s = useGame();
   const { t } = useT();
+  if (!["boy", "girl"].includes(s.equipped.character)) return <Chooser />;
   const lv = levelInfo(s.xp);
   const all = Object.values(s.subjects);
   const answered = all.reduce((a, x) => a + x.answered, 0);
@@ -28,7 +30,7 @@ function Dashboard() {
         </div>
         <div className="mt-6 flex justify-between text-sm"><span>{t("xp")}</span><span>{lv.into} / {lv.need}</span></div>
         <div className="h-4 overflow-hidden rounded-full bg-background/30"><div className="bar-grow h-full bg-coin-grad" style={{ width: `${lv.pct}%` }} /></div>
-        <div className="animate-float absolute end-10 top-4 hidden md:block"><Avatar /></div>
+        <div className="absolute end-10 top-3 hidden md:block"><Avatar className="w-48" /></div>
       </section>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {stats.map(([i, v, l]) => (
@@ -50,6 +52,23 @@ function Dashboard() {
         <Card><h2 className="mb-4 text-2xl font-bold">Badges</h2>
           <div className="grid grid-cols-4 gap-3">{badges.map(([e, n, on]) => <div key={n} title={n} className={`grid h-14 w-14 place-items-center rounded-full text-2xl ${on ? "bg-accent/30" : "bg-muted opacity-40 grayscale"}`}>{e}</div>)}</div>
           <p className="mt-4 text-muted-foreground">{badges.filter((b) => b[2]).length}/{badges.length} earned</p></Card>
+      </div>
+    </div>
+  );
+}
+
+function Chooser() {
+  return (
+    <div className="mx-auto max-w-2xl py-6 text-center">
+      <h1 className="text-4xl font-bold">Choose your hero!</h1>
+      <p className="mt-2 text-muted-foreground">You can change this any time in Rewards.</p>
+      <div className="mt-8 grid grid-cols-2 gap-5">
+        {(["boy", "girl"] as const).map((g) => (
+          <button key={g} onClick={() => equip("character", g)} className="game-card animate-pop p-5 transition-transform hover:-translate-y-1">
+            <img src={`/characters/${g}-school.png`} alt={g} className="mx-auto h-64 object-contain" />
+            <span className="mt-2 block font-display text-xl font-bold capitalize">{g}</span>
+          </button>
+        ))}
       </div>
     </div>
   );
