@@ -25,13 +25,13 @@ export interface GameState {
   runs: Record<SubjectId, { ok: number; bad: number }>;
   subjects: Record<SubjectId, Stat>;
   topics: Record<string, Stat>;
-  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>; history: Record<string, { n: number; ok: number; xp: number }>; friends: string[]; recent: Record<SubjectId, boolean[]>;
+  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>; history: Record<string, { n: number; ok: number; xp: number }>; friends: string[]; recent: Record<SubjectId, boolean[]>; world: number; seenWorld: number; music: boolean; claimed: string;
 }
 const initial = (): GameState => ({
   xp: 0, coins: 0, streak: 0, lastDay: "",
   settings: { largeText: false, highContrast: false, dyslexia: false },
   difficulty: bySubject(() => 0), runs: bySubject(() => ({ ok: 0, bad: 0 })),
-  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: {}, history: {}, friends: ["Ava Chen", "Leo Martin", "Mia Singh"], recent: bySubject(() => [] as boolean[]),
+  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: {}, history: {}, friends: ["Ava Chen", "Leo Martin", "Mia Singh"], recent: bySubject(() => [] as boolean[]), world: 0, seenWorld: 0, music: true, claimed: "",
 });
 
 const KEY = "stemquest-v1";

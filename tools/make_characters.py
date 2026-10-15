@@ -32,6 +32,12 @@ for r, (g, (x0, kx0, kx1)) in enumerate(CROPS.items()):
     keep = np.zeros_like(alpha); keep[:, kx0:kx1] = 1
     al = (alpha * keep)[Y0:Y1, x0:x0 + W]
     rgb = a[Y0:Y1, x0:x0 + W]
+    # lighter skin (matches the costume art): shift the average skin colour, keep the shading
+    sk = np.clip((rgb.max(2) - 0.45) / 0.15, 0, 1) * ((rgb[..., 0] > rgb[..., 1]) & (rgb[..., 1] > rgb[..., 2]) & (rgb[..., 0] - rgb[..., 2] > 0.10))
+    sk = ndi.gaussian_filter(sk, 0.7) * (al > 0.2)
+    if sk.sum() > 50:
+        mean = (rgb * sk[..., None]).sum((0, 1)) / sk.sum()
+        rgb = np.clip(rgb + (np.array([238, 186, 152]) / 255 - mean) * sk[..., None], 0, 1)
     rr, gg, bb = rgb[..., 0], rgb[..., 1], rgb[..., 2]
     w = np.clip((bb - rr - 0.02) / 0.1, 0, 1) * (rgb.max(2) < 0.7)   # how "navy" each pixel is
     lum = np.clip((rgb.max(2) - 0.08) / 0.5, 0, 1)[..., None]
