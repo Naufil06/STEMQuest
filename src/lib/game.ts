@@ -25,25 +25,24 @@ export interface GameState {
   runs: Record<SubjectId, { ok: number; bad: number }>;
   subjects: Record<SubjectId, Stat>;
   topics: Record<string, Stat>;
-  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>; history: Record<string, { n: number; ok: number; xp: number }>; friends: string[]; recent: Record<SubjectId, boolean[]>; world: number; seenWorld: number; music: boolean; claimed: string;
+  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>; history: Record<string, { n: number; ok: number; xp: number }>; friends: string[]; recent: Record<SubjectId, boolean[]>; world: number; seenWorld: number; music: boolean; claimed: string; tokens: number;
 }
 const initial = (): GameState => ({
   xp: 0, coins: 0, streak: 0, lastDay: "",
   settings: { largeText: false, highContrast: false, dyslexia: false },
   difficulty: bySubject(() => 0), runs: bySubject(() => ({ ok: 0, bad: 0 })),
-  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: {}, history: {}, friends: ["Ava Chen", "Leo Martin", "Mia Singh"], recent: bySubject(() => [] as boolean[]), world: 0, seenWorld: 0, music: true, claimed: "",
+  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: {}, history: {}, friends: [], recent: bySubject(() => [] as boolean[]), world: 0, seenWorld: 0, music: true, claimed: "", tokens: 3,
 });
 
-const KEY = "stemquest-v1";
-function load(): GameState {
-  try { const raw = localStorage.getItem(KEY); if (raw) return { ...initial(), ...JSON.parse(raw) }; } catch { /* ignore */ }
-  return initial();
-}
-let state = load();
+let state = initial();   // the signed-in account's data (loaded/saved through src/lib/auth.ts)
+let saver: (() => void) | null = null;
+export const setSaver = (f: (() => void) | null) => { saver = f; };
+export const getState = () => state;
+export function loadState(o: Partial<GameState> | null) { state = { ...initial(), ...(o ?? {}) }; subs.forEach((f) => f()); }
 const subs = new Set<() => void>();
 export function set(fn: (s: GameState) => GameState) {
   state = fn(state);
-  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignore */ }
+  saver?.();
   subs.forEach((f) => f());
 }
 export const useGame = () => useSyncExternalStore((f) => { subs.add(f); return () => subs.delete(f); }, () => state, () => state);
@@ -61,15 +60,15 @@ export function levelInfo(xp: number) {
 const day = (d = new Date()) => d.toISOString().slice(0, 10);
 
 /** Adaptive engine: 3 correct in a row => harder, 2 wrong in a row => easier. */
-export function recordAnswer(sid: SubjectId, topic: string, d: number, ok: boolean) {
+export function recordAnswer(sid: SubjectId, topic: string, d: number, ok: boolean, assisted = false) {
   const before = levelInfo(state.xp).level;
-  const xp = ok ? DIFF_XP[d] + Math.min(state.runs[sid].ok, 5) * 2 : 2;
+  const xp = ok ? Math.round((DIFF_XP[d] + Math.min(state.runs[sid].ok, 5) * 2) * (assisted ? 0.5 : 1)) : 2;   // help (simplify / solution) = half XP
   let newDiff = state.difficulty[sid];
   set((s) => {
     const r = s.runs[sid];
     let run = { ok: ok ? r.ok + 1 : 0, bad: ok ? 0 : r.bad + 1 };
     let nd = s.difficulty[sid];
-    const win = [...(s.recent?.[sid] ?? []), ok].slice(-12);
+    const win = assisted ? (s.recent?.[sid] ?? []) : [...(s.recent?.[sid] ?? []), ok].slice(-12);   // helped answers don't count towards moving up
     const [need, span] = PROMOTE[nd] ?? [99, 99];
     const last = win.slice(-span), end = win.slice(-4);
     let recent = win;
@@ -81,12 +80,21 @@ export function recordAnswer(sid: SubjectId, topic: string, d: number, ok: boole
     const today = day(), yest = day(new Date(Date.now() - 864e5));
     const streak = s.lastDay === today ? s.streak : s.lastDay === yest ? s.streak + 1 : 1;
     const h = s.history?.[today] ?? { n: 0, ok: 0, xp: 0 };
+    // +1 simplify token every 8 correct answers and on each level-up (max 10)
+    const okTotal = Object.values(s.subjects).reduce((a, x) => a + x.correct, 0) + (ok ? 1 : 0);
+    const tokens = Math.min(10, (s.tokens ?? 3) + (ok && okTotal % 8 === 0 ? 1 : 0) + (levelInfo(s.xp + xp).level > levelInfo(s.xp).level ? 1 : 0));
     return {
-      ...s, history: { ...s.history, [today]: { n: h.n + 1, ok: h.ok + (ok ? 1 : 0), xp: h.xp + xp } }, xp: s.xp + xp, coins: s.coins + (ok ? Math.round(xp / 2) : 0), streak, lastDay: today,
+      ...s, tokens, history: { ...s.history, [today]: { n: h.n + 1, ok: h.ok + (ok ? 1 : 0), xp: h.xp + xp } }, xp: s.xp + xp, coins: s.coins + (ok ? Math.round(xp / 2) : 0), streak, lastDay: today,
       difficulty: { ...s.difficulty, [sid]: nd }, runs: { ...s.runs, [sid]: run }, recent: { ...s.recent, [sid]: recent },
       subjects: { ...s.subjects, [sid]: bump(s.subjects[sid]) },
       topics: { ...s.topics, [topic]: bump(s.topics[topic]) },
     };
   });
   return { xp, levelUp: levelInfo(state.xp).level > before, newDiff };
+}
+
+export function spendToken() {
+  let ok = false;
+  set((s) => { if ((s.tokens ?? 0) < 1) return s; ok = true; return { ...s, tokens: s.tokens - 1 }; });
+  return ok;
 }

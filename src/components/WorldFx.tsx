@@ -2,11 +2,13 @@ import { useEffect } from "react";
 import { useGame } from "@/lib/game";
 import { WORLDS, topWorld, travel, seeWorld, toggleMusic } from "@/lib/rewards";
 import { setMusic, resumeMusic } from "@/lib/music";
+import { useAuth, logout } from "@/lib/auth";
 import { GameButton } from "@/components/ui-game";
 
 /** Applies the current world's theme + music, shows the mute button and the "new world unlocked" pop-up. */
 export function WorldFx() {
   const s = useGame();
+  const { user } = useAuth();
   const w = Math.min(s.world ?? 0, WORLDS.length - 1), on = s.music !== false, top = topWorld(s.xp);
   useEffect(() => { document.documentElement.dataset.world = WORLDS[w].key; }, [w]);
   useEffect(() => { setMusic(on, w); }, [on, w]);
@@ -16,7 +18,10 @@ export function WorldFx() {
   }, []);
   return (
     <>
-      <button onClick={toggleMusic} aria-label={on ? "Mute music" : "Play music"} title={on ? "Mute music" : "Play music"} className="fixed bottom-4 end-4 z-40 grid h-12 w-12 place-items-center rounded-full bg-primary text-xl text-primary-foreground shadow-pop">{on ? "🎵" : "🔇"}</button>
+      <div className="fixed bottom-4 end-4 z-40 flex items-center gap-2">
+        {user && <><span className="hidden rounded-full bg-card px-3 py-2 text-sm font-semibold text-card-foreground shadow sm:inline">👤 {user.username}</span><button onClick={() => void logout()} className="rounded-full bg-secondary px-3 py-2 text-sm font-semibold shadow">Log out</button></>}
+      <button onClick={toggleMusic} aria-label={on ? "Mute music" : "Play music"} title={on ? "Mute music" : "Play music"} className="grid h-12 w-12 place-items-center rounded-full bg-primary text-xl text-primary-foreground shadow-pop">{on ? "🎵" : "🔇"}</button>
+      </div>
       {top > (s.seenWorld ?? 0) && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4">
           <div className="game-card animate-pop max-w-md p-8 text-center">

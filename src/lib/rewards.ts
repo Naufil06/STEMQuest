@@ -74,4 +74,4 @@ export const equip = (slot: Slot, id: string | null) =>
 export const travel = (i: number) => set((s) => ({ ...s, world: i, seenWorld: Math.max(s.seenWorld ?? 0, i) }));
 export const seeWorld = (i: number) => set((s) => ({ ...s, seenWorld: Math.max(s.seenWorld ?? 0, i) }));
 export const toggleMusic = () => set((s) => ({ ...s, music: s.music === false }));
-export const claimDaily = () => { const d = new Date().toISOString().slice(0, 10); set((s) => (s.claimed === d ? s : { ...s, coins: s.coins + 50, claimed: d })); };
+export const claimDaily = () => { const d = new Date().toISOString().slice(0, 10); set((s) => (s.claimed === d ? s : { ...s, coins: s.coins + 50, tokens: Math.min(10, (s.tokens ?? 0) + 1), claimed: d })); };

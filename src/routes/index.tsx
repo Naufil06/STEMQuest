@@ -27,7 +27,7 @@ function Dashboard() {
         <p className="text-xl font-semibold">{t("welcome")}</p>
         <h1 className="text-5xl font-bold md:text-6xl">Explorer</h1>
         <div className="mt-4 flex flex-wrap gap-2 font-display">
-          {[`⭐ ${t("level")} ${lv.level}`, `🎖️ ${rankFor(lv.level)}`, `🪙 ${s.coins}`, `${WORLDS[s.world ?? 0].emoji} ${WORLDS[s.world ?? 0].name}`].map((x) => <span key={x} className="rounded-full bg-background/20 px-4 py-1.5">{x}</span>)}
+          {[`⭐ ${t("level")} ${lv.level}`, `🎖️ ${rankFor(lv.level)}`, `🪙 ${s.coins}`, `🪄 ${s.tokens ?? 0}`, `${WORLDS[s.world ?? 0].emoji} ${WORLDS[s.world ?? 0].name}`].map((x) => <span key={x} className="rounded-full bg-background/20 px-4 py-1.5">{x}</span>)}
         </div>
         <div className="mt-6 flex justify-between text-sm"><span>{t("xp")}</span><span>{lv.into} / {lv.need}</span></div>
         <div className="h-4 overflow-hidden rounded-full bg-background/30"><div className="bar-grow h-full bg-coin-grad" style={{ width: `${lv.pct}%` }} /></div>
@@ -85,7 +85,7 @@ function Daily() {
       <span className="text-4xl">📅</span>
       <div className="min-w-48 flex-1"><p className="font-display text-xl font-bold">Daily Quest: answer 5 questions</p><Bar value={(n / 5) * 100} className="mt-2" /></div>
       <span className="font-semibold">{n}/5</span>
-      <GameButton variant="accent" disabled={n < 5 || done} onClick={() => { claimDaily(); toast("🪙 +50 coins!"); }}>{done ? "Claimed ✓" : "Claim 🪙 50"}</GameButton>
+      <GameButton variant="accent" disabled={n < 5 || done} onClick={() => { claimDaily(); toast("🪙 +50 coins and 🪄 +1 simplify token!"); }}>{done ? "Claimed ✓" : "Claim 🪙 50 + 🪄 1"}</GameButton>
     </Card>
   );
 }

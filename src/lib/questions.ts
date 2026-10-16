@@ -2,7 +2,7 @@ import type { SubjectId } from "./game";
 import { EXTRA } from "./bank";
 import { mathQuestion } from "./math";
 
-export interface Question { id: string; q: string; a: string; options?: string[]; topic: string; d: number }
+export interface Question { id: string; q: string; a: string; options?: string[]; topic: string; d: number; steps?: string[]; easy?: Question; exact?: boolean }
 
 const r = (a: number, b: number) => a + Math.floor(Math.random() * (b - a + 1));
 const shuffle = <T,>(x: T[]) => [...x].sort(() => Math.random() - 0.5);
@@ -42,4 +42,18 @@ export function pickQuestion(sid: SubjectId, d: number, _lang: string, seen: Set
   return { id: `${sid}-${row[3]}`, q: row[3], a: row[4], options: row[5] ? shuffle(row[5]) : undefined, topic: row[1], d: row[2] };
 }
 
-export const isCorrect = (q: Question, v: string) => v.trim().toLowerCase() === q.a.toLowerCase();
+// "2/4", "1/2" and "1 1/2" all count as right when the answer is a fraction (unless the question needs the simplest form)
+const frac = (s: string): [number, number] | null => {
+  const t = s.trim().replace(/\s+/g, " ");
+  let m = t.match(/^(-?\d+)\/(\d+)$/); if (m) return [+m[1], +m[2]];
+  m = t.match(/^(\d+) (\d+)\/(\d+)$/); if (m) return [+m[1] * +m[3] + +m[2], +m[3]];
+  return /^-?\d+$/.test(t) ? [+t, 1] : null;
+};
+export function isCorrect(q: Question, v: string) {
+  const t = v.trim();
+  if (t.toLowerCase() === q.a.toLowerCase()) return true;
+  if (t !== "" && !isNaN(Number(t)) && !isNaN(Number(q.a)) && Number(t) === Number(q.a)) return true;   // 3.50 = 3.5
+  if (q.exact || !q.a.includes("/")) return false;
+  const x = frac(t), y = frac(q.a);
+  return !!x && !!y && x[1] !== 0 && x[0] * y[1] === y[0] * x[1];
+}
