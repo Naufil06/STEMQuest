@@ -20,14 +20,21 @@ const DATA: [string, string, string, string, string, string, string][] = [
   ["Gear Farm", "Steam City", "#8c7a62", "🪲", "⚙️ Gear Seed,🔩 Bolt Bean,🕰️ Clock Flower", "🔧 Workshop,🚂 Steam Train,🔭 Observatory", "🏭 Steam Factory,🕰️ Clock Tower,✈️ Airship Dock"],
   ["Rainbow Garden", "Aurora City", "#f2d6ff", "☁️", "🌈 Rainbow Bean,⭐ Star Fruit,🌻 Sun Bloom", "🦄 Unicorn Stable,🎠 Dream Carousel,🏔️ Summit Hut", "🏰 Rainbow Castle,🎆 Firework Hall,🌟 Star Tower"],
 ];
-export interface FItem { id: string; emoji: string; name: string; cost: number; income: number; grow: number; sell: number }
+export interface FItem { id: string; emoji: string; name: string; cost: number; income: number; grow: number; sell: number; kind: string }
+// Which drawn building style each item gets (first match wins). See drawBuilding() in farmScene.ts.
+const KINDS: [RegExp, string][] = [[/\bpen\b/i, "pen"], [/rocket/i, "tower"], [/dock|harbor|bridge|landing/i, "dock"], [/tent|fair/i, "tent"], [/wheel|carousel/i, "wheel"],
+  [/castle|palace|fort\b|museum|arena|armory|hall\b/i, "castle"], [/tower|lighthouse|antenna|hotel|bell|satellite/i, "tower"], [/dome|telescope|observatory|lab\b|hub|igloo|tank/i, "dome"],
+  [/pyramid|volcano/i, "pyramid"], [/factory|foundry|forge|workshop|airport|station|train|arcade|terminal|battery|mine\b/i, "factory"], [/fountain|jar|snowman|lamp|rock|dig/i, "fountain"],
+  [/market|bazaar|stand|shop|mart|stop|donut|cake|sled/i, "stall"], [/barn|stable/i, "barn"], [/house|hut|hive|cottage|lodge|homes|cave|loft/i, "house"], [/tree|palm|perch|island/i, "tree"]];
+export const kindOf = (name: string) => KINDS.find(([re]) => re.test(name))?.[1] ?? "house";
 export function farmOf(w: number) {
   const [farmName, cityName, soil, foe, se, fa, ci] = DATA[w], k = 1 + w * 0.3, kb = 1 + w * 0.25;
-  const seeds: FItem[] = P(se).map(([emoji, name], j) => ({ id: `s${w}_${j}`, emoji, name, cost: Math.round([8, 15, 30][j] * k), income: 0, grow: [30, 60, 120][j], sell: Math.round([6, 12, 25][j] * k) }));
-  const mk = (list: string, pre: string, base: number, inc: number[]): FItem[] => P(list).map(([emoji, name], j) => ({ id: `${pre}${w}_${j}`, emoji, name, cost: Math.round(base * (j + 1) * kb), income: inc[j], grow: 0, sell: 0 }));
-  return { farmName, cityName, soil, foe, seeds, farmItems: mk(fa, "f", 50, [0, 1, 2]), cityItems: mk(ci, "y", 250, [3, 6, 10]), upgrade: 300 * (w + 1) };
+  const seeds: FItem[] = P(se).map(([emoji, name], j) => ({ id: `s${w}_${j}`, emoji, name, cost: Math.round([8, 15, 30][j] * k), income: 0, grow: [30, 60, 120][j], sell: Math.round([6, 12, 25][j] * k), kind: "crop" }));
+  const mk = (list: string, pre: string, base: number, inc: number[]): FItem[] => P(list).map(([emoji, name], j) => ({ id: `${pre}${w}_${j}`, emoji, name, cost: Math.round(base * (j + 1) * kb), income: inc[j], grow: 0, sell: 0, kind: kindOf(name) }));
+  const decor: FItem[] = ([["Flower Bed", "🌷", "flowers", 15], ["Pond", "💧", "pond", 40], ["Big Tree", "🌳", "tree", 30]] as [string, string, string, number][]).map(([name, emoji, kind, cost], j) => ({ id: `d${w}_${j}`, emoji, name, cost, income: 0, grow: 0, sell: 0, kind }));
+  return { farmName, cityName, soil, foe, seeds, decor, farmItems: mk(fa, "f", 50, [0, 1, 2]), cityItems: mk(ci, "y", 250, [3, 6, 10]), upgrade: 300 * (w + 1) };
 }
-export const itemById = (id: string): FItem | undefined => { const F = farmOf(+id.slice(1).split("_")[0]); return [...F.seeds, ...F.farmItems, ...F.cityItems].find((x) => x.id === id); };
+export const itemById = (id: string): FItem | undefined => { const F = farmOf(+id.slice(1).split("_")[0]); return [...F.seeds, ...F.farmItems, ...F.cityItems, ...F.decor].find((x) => x.id === id); };
 export const cropSeed = (cropId: string) => itemById("s" + cropId.slice(1))!;   // crop "c3_1" grows from seed "s3_1"
 
 const get = (s: GameState, w: number) => s.farms?.[w] ?? { city: false, tiles: {} };

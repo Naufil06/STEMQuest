@@ -5,7 +5,8 @@ import { useGame } from "@/lib/game";
 import { seo } from "@/lib/seo";
 import { WORLDS, unlocked } from "@/lib/rewards";
 import { farmOf, itemById, plant, harvest, build, bulldoze, upgradeCity, buySeed, sellCrop, pending, collect } from "@/lib/farm";
-import { Bar, Card, GameButton } from "@/components/ui-game";
+import { Card, GameButton } from "@/components/ui-game";
+import { FarmCanvas } from "@/components/FarmCanvas";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/farm")({ head: () => seo("Farm", "Grow crops and build your farm into a city."), component: FarmPage });
@@ -16,7 +17,7 @@ function FarmPage() {
   const [w, setW] = useState(Math.min(s.world ?? 0, WORLDS.length - 1)), [tool, setTool] = useState<Tool>(null), [now, setNow] = useState(Date.now());
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   const W = WORLDS[w], F = farmOf(w), farm = s.farms?.[w] ?? { city: false, tiles: {} };
-  const cols = farm.city ? 7 : 5, rows = farm.city ? 5 : 4, inv = (id: string) => s.inv?.[id] ?? 0;
+  const inv = (id: string) => s.inv?.[id] ?? 0;
   const owned = WORLDS.map((_, i) => i).filter((i) => unlocked(i, s));
   const income = pending(s, w, now);
   const click = (key: string) => {
@@ -45,22 +46,8 @@ function FarmPage() {
               <Link to="/play/$world" params={{ world: String(w) }} className="rounded-xl bg-white/25 px-4 py-2 font-semibold hover:bg-white/40">🎮 Get seeds</Link>
             </div>
           </div>
-          <div className="p-4" style={{ background: `linear-gradient(135deg,${W.c1}33,${W.c2}33)` }}>
-            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))` }}>
-              {Array.from({ length: cols * rows }, (_, n) => {
-                const key = `${n % cols},${Math.floor(n / cols)}`, t = farm.tiles[key], it = t ? itemById(t.id) : undefined;
-                const p = t?.k === "c" && it ? Math.min(1, (now - t.at) / (it.grow * 1000)) : 0;
-                return (
-                  <button key={key} onClick={() => click(key)} aria-label={it ? it.name : "empty plot"} style={{ background: F.soil }}
-                    className="relative grid aspect-square place-items-center rounded-xl border-2 border-black/10 text-3xl shadow-inner transition-transform hover:scale-105 sm:text-4xl">
-                    {t?.k === "c" ? (p >= 1 ? <span className="animate-pop">{it!.emoji}</span> : <span>{p < 0.5 ? "🌱" : "🌿"}</span>) : t?.k === "b" ? it!.emoji : <span className="text-base opacity-30">+</span>}
-                    {t?.k === "c" && p < 1 && <span className="absolute inset-x-1 bottom-1 h-1.5 overflow-hidden rounded bg-black/20"><span className="block h-full bg-success" style={{ width: `${p * 100}%` }} /></span>}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">Pick a seed or building on the right, then tap an empty plot. Tap a fully grown crop to harvest it.</p>
-          </div>
+          <FarmCanvas w={w} city={farm.city} tiles={farm.tiles} ghost={tool && tool.k !== "bull" ? tool.id ?? null : null} onTile={click} />
+          <p className="p-3 text-sm text-muted-foreground">Pick a seed or building on the right, then tap the land. Buildings replace your fields as your farm grows. Tap a grown crop to harvest it.</p>
         </Card>
         <div className="space-y-5">
           <Card className="space-y-2">
@@ -74,7 +61,7 @@ function FarmPage() {
           </Card>
           <Card className="space-y-2">
             <h2 className="text-xl font-bold">🏗️ Build</h2>
-            {[...F.farmItems, ...(farm.city ? F.cityItems : [])].map((it) => (
+            {[...F.farmItems, ...(farm.city ? F.cityItems : []), ...F.decor].map((it) => (
               <button key={it.id} className={cn(chip(tool?.id === it.id), "w-full")} onClick={() => setTool({ k: "build", id: it.id })}>{it.emoji} {it.name} <span className="text-muted-foreground">🪙{it.cost}{it.income ? ` · +${it.income}/min` : ""}</span></button>
             ))}
             <button className={cn(chip(tool?.k === "bull"), "w-full")} onClick={() => setTool({ k: "bull" })}>🧹 Clear a building</button>
@@ -95,7 +82,6 @@ function FarmPage() {
           </Card>
         </div>
       </div>
-      <Bar value={Math.min(100, Object.keys(farm.tiles).length / (cols * rows) * 100)} className="h-2" />
     </div>
   );
 }
