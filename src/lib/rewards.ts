@@ -46,15 +46,24 @@ export const WORLDS = [
   { id: 5, key: "volcano", name: "Volcano Core", emoji: "🌋", level: 20, xp: 6000, c1: "#ef4444", c2: "#7f1d1d", blurb: "Cool the volcano by solving the Lava Locks." },
   { id: 6, key: "crystal", name: "Crystal Caves", emoji: "💎", level: 25, xp: 9500, c1: "#e879f9", c2: "#7e22ce", blurb: "Light up the caves with the glowing crystals of logic." },
   { id: 7, key: "arctic", name: "Arctic Tundra", emoji: "❄️", level: 30, xp: 13500, c1: "#67e8f9", c2: "#0e7490", blurb: "Follow the aurora to the Ice Lab at the top of the world." },
-  { id: 8, key: "cyber", name: "Cyber City", emoji: "🤖", level: 40, xp: 23000, c1: "#22d3ee", c2: "#c026d3", blurb: "Reboot the city's giant computer. This is the final mission!" },
+  { id: 8, key: "cyber", name: "Cyber City", emoji: "🤖", level: 40, xp: 23000, c1: "#22d3ee", c2: "#c026d3", blurb: "Reboot the city's giant computer. Reboot the neon grid." },
+  { id: 9, key: "jungle", name: "Jungle Canopy", emoji: "🦜", level: 45, xp: 28100, c1: "#34d399", c2: "#047857", blurb: "Swing through the treetops to find the missing golden banana." },
+  { id: 10, key: "candy", name: "Candy Kingdom", emoji: "🍭", level: 50, xp: 34300, c1: "#f472b6", c2: "#be185d", blurb: "Help the Sugar Queen sort the sweets without a single wrong count!" },
+  { id: 11, key: "dino", name: "Dino Valley", emoji: "🦕", level: 55, xp: 41200, c1: "#a3e635", c2: "#4d7c0f", blurb: "Follow the footprints to the hidden nest of the giant dinosaur." },
+  { id: 12, key: "clockwork", name: "Clockwork Factory", emoji: "⚙️", level: 60, xp: 48700, c1: "#d6a35c", c2: "#78350f", blurb: "Restart the great clock by fitting every gear in place." },
+  { id: 13, key: "rainbow", name: "Rainbow Summit", emoji: "🌈", level: 70, xp: 65600, c1: "#f0abfc", c2: "#6366f1", blurb: "Climb the rainbow to the top of the world. This is the final mission!" },
 ];
+/** worldOpen = level + XP reached. unlocked = reached AND the platformer challenge was cleared. */
 export const worldOpen = (i: number, xp: number) => levelInfo(xp).level >= WORLDS[i].level && xp >= WORLDS[i].xp;
-export const topWorld = (xp: number) => WORLDS.reduce((a, _w, i) => (worldOpen(i, xp) ? i : a), 0);
-export function lockText(i: Item, xp: number): string | null {
+export const clearedOf = (s: { cleared?: number[] }) => s.cleared ?? [0];
+export const unlocked = (i: number, s: { xp: number; cleared?: number[] }) => i === 0 || (worldOpen(i, s.xp) && clearedOf(s).includes(i));
+export const pendingWorld = (s: { xp: number; cleared?: number[] }) => WORLDS.findIndex((_, i) => i > 0 && worldOpen(i, s.xp) && !clearedOf(s).includes(i));   // -1 = none
+export const grandfather = () => set((s) => (s.cleared ? s : { ...s, cleared: WORLDS.map((_, i) => i).filter((i) => i === 0 || worldOpen(i, s.xp)) }));   // old saves keep the worlds they had
+export function lockText(i: Item, s: { xp: number; cleared?: number[] }): string | null {
   const L = i.lock;
   if (!L) return null;
-  if (L.world !== undefined && !worldOpen(L.world, xp)) return `World ${L.world + 1}: ${WORLDS[L.world].name}`;
-  if (L.level && levelInfo(xp).level < L.level) return `Level ${L.level}`;
+  if (L.world !== undefined && !unlocked(L.world, s)) return `World ${L.world + 1}: ${WORLDS[L.world].name}`;
+  if (L.level && levelInfo(s.xp).level < L.level) return `Level ${L.level}`;
   return null;
 }
 
@@ -63,7 +72,7 @@ export function buy(id: string) {
   let ok = false;
   if (!it) return false;
   set((s) => {
-    if (isOwned(s.owned, id) || s.coins < it.price || lockText(it, s.xp)) return s;
+    if (isOwned(s.owned, id) || s.coins < it.price || lockText(it, s)) return s;
     ok = true;
     return { ...s, coins: s.coins - it.price, owned: [...s.owned, id], equipped: { ...s.equipped, [it.slot]: id } };
   });

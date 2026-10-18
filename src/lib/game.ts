@@ -25,13 +25,13 @@ export interface GameState {
   runs: Record<SubjectId, { ok: number; bad: number }>;
   subjects: Record<SubjectId, Stat>;
   topics: Record<string, Stat>;
-  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>; history: Record<string, { n: number; ok: number; xp: number }>; friends: string[]; recent: Record<SubjectId, boolean[]>; world: number; seenWorld: number; music: boolean; claimed: string; tokens: number;
+  unlockedWorlds: number[]; owned: string[]; equipped: Record<string, string>; history: Record<string, { n: number; ok: number; xp: number }>; friends: string[]; recent: Record<SubjectId, boolean[]>; world: number; seenWorld: number; music: boolean; claimed: string; tokens: number; cleared?: number[]; inv: Record<string, number>; farms: Record<number, Farm>;
 }
 const initial = (): GameState => ({
   xp: 0, coins: 0, streak: 0, lastDay: "",
   settings: { largeText: false, highContrast: false, dyslexia: false },
   difficulty: bySubject(() => 0), runs: bySubject(() => ({ ok: 0, bad: 0 })),
-  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: {}, history: {}, friends: [], recent: bySubject(() => [] as boolean[]), world: 0, seenWorld: 0, music: true, claimed: "", tokens: 3,
+  subjects: bySubject(stat), topics: {}, unlockedWorlds: [0], owned: [], equipped: {}, history: {}, friends: [], recent: bySubject(() => [] as boolean[]), world: 0, seenWorld: 0, music: true, claimed: "", tokens: 3, inv: {}, farms: {},
 });
 
 let state = initial();   // the signed-in account's data (loaded/saved through src/lib/auth.ts)
@@ -98,3 +98,6 @@ export function spendToken() {
   set((s) => { if ((s.tokens ?? 0) < 1) return s; ok = true; return { ...s, tokens: s.tokens - 1 }; });
   return ok;
 }
+
+export type Tile = { k: "c" | "b"; id: string; at: number };   // c = crop growing (at = planted), b = building (at = last income pick-up)
+export interface Farm { city: boolean; tiles: Record<string, Tile> }

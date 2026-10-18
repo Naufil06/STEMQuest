@@ -41,7 +41,7 @@ function Rewards() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {ITEMS.filter((i) => i.slot === slot).sort((a, b) => a.price - b.price).map((i) => {
-              const own = isOwned(s.owned, i.id), on = current(i) === i.id, fixed = i.slot === "character" || i.slot === "costume", lock = own ? null : lockText(i, s.xp);
+              const own = isOwned(s.owned, i.id), on = current(i) === i.id, fixed = i.slot === "character" || i.slot === "costume", lock = own ? null : lockText(i, s);
               return (
                 <Card key={i.id} className={cn("animate-pop text-center", on && "border-success")}>
                   <div className={cn("grid h-40 place-items-center", lock && "opacity-60 grayscale")}>{thumb(i)}</div>

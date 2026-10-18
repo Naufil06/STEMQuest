@@ -1,5 +1,5 @@
 import { set, levelInfo, type GameState, type SubjectId } from "./game";
-import { WORLDS } from "./rewards";
+import { WORLDS, unlocked } from "./rewards";
 
 export interface Kid { name: string; username?: string; level: number; xp: number; acc: number; streak: number; weekly: number; world: string; online: boolean }
 export const weekXp = (s: GameState, off = 0) =>
@@ -7,7 +7,7 @@ export const weekXp = (s: GameState, off = 0) =>
 export function meKid(s: GameState): Kid {
   const all = Object.values(s.subjects), n = all.reduce((a, x) => a + x.answered, 0), c = all.reduce((a, x) => a + x.correct, 0);
   const lv = levelInfo(s.xp).level;
-  return { name: "You", level: lv, xp: s.xp, acc: n ? Math.round((c / n) * 100) : 0, streak: s.streak, weekly: weekXp(s), world: WORLDS.filter((w) => lv >= w.level && s.xp >= w.xp).pop()!.name, online: true };
+  return { name: "You", level: lv, xp: s.xp, acc: n ? Math.round((c / n) * 100) : 0, streak: s.streak, weekly: weekXp(s), world: WORLDS.filter((_, i) => unlocked(i, s)).pop()!.name, online: true };
 }
 export const addFriend = (n: string) => set((s) => ({ ...s, friends: [...new Set([...(s.friends ?? []), n])] }));
 export const setDifficulty = (sid: SubjectId, d: number) => set((s) => ({ ...s, difficulty: { ...s.difficulty, [sid]: d }, recent: { ...s.recent, [sid]: [] } }));

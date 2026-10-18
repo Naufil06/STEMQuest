@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { loadState, setSaver, getState } from "./game";
 import { meKid } from "./sample";
+import { grandfather } from "./rewards";
 
 export interface User { username: string; role: "student" | "teacher" }
 type Status = { user: User | null; ready: boolean; error?: string };
@@ -24,6 +25,7 @@ function push() {
 }
 function enter(user: User, state: unknown) {
   loadState((state as object) ?? null);
+  grandfather();
   setSaver(() => { clearTimeout(timer); timer = window.setTimeout(push, 800); });   // save ~1s after every change
   clearInterval(beat); beat = window.setInterval(push, 60000);                       // heartbeat keeps "online" status fresh
   emit({ user, ready: true, error: undefined });

@@ -19,7 +19,7 @@ function Dashboard() {
   const correct = all.reduce((a, x) => a + x.correct, 0);
   const studied = all.filter((x) => x.answered > 0).length;
   const stats = [["❓", answered, "Questions"], ["✅", correct, "Correct"], ["🎯", `${answered ? Math.round((correct / answered) * 100) : 0}%`, "Accuracy"], ["🔥", s.streak, "Day streak"], ["📚", `${studied}/4`, "Subjects"]];
-  const actions = [["▶️", "Continue Learning", "/subjects", "bg-primary"], ["🗺️", "Visit World Map", "/world-map", "bg-success"], ["🎁", "View Rewards", "/rewards", "bg-accent text-accent-foreground"], ["📈", "View Progress", "/progress", "bg-xp"]];
+  const actions = [["▶️", "Continue Learning", "/subjects", "bg-primary"], ["🗺️", "Visit World Map", "/world-map", "bg-success"], ["🎁", "View Rewards", "/rewards", "bg-accent text-accent-foreground"], ["📈", "View Progress", "/progress", "bg-xp"], ["🌾", "My Farm", "/farm", "bg-science"]];
   const badges = [["👣", "First Steps", answered >= 1], ["⚡", "Quick Learner", answered >= 10], ["🎓", "Scholar", lv.level >= 5], ["🔥", "On Fire", s.streak >= 3]] as const;
   return (
     <div className="space-y-6">
@@ -38,7 +38,7 @@ function Dashboard() {
           <Card key={l as string} className="animate-pop text-center"><div className="text-3xl">{i}</div><div className="font-display text-3xl font-bold">{v}</div><div className="text-sm text-muted-foreground">{l}</div></Card>
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {actions.map(([i, l, to, c]) => (
           <Link key={to} to={to} className={`${c} shadow-pop rounded-2xl p-5 text-center font-display text-lg font-bold text-primary-foreground transition-transform hover:-translate-y-1`}>
             <div className="text-3xl">{i}</div>{l}

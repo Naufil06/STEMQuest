@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FarmRouteImport } from './routes/farm'
 import { Route as FriendsRouteImport } from './routes/friends'
 import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
 import { Route as ParentRouteImport } from './routes/parent'
@@ -19,12 +20,18 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as TeacherRouteImport } from './routes/teacher'
 import { Route as WorldMapRouteImport } from './routes/world-map'
+import { Route as PlayWorldRouteImport } from './routes/play.$world'
 import { Route as SubjectsIndexRouteImport } from './routes/subjects.index'
 import { Route as SubjectsSubjectRouteImport } from './routes/subjects.$subject'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FarmRoute = FarmRouteImport.update({
+  id: '/farm',
+  path: '/farm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FriendsRoute = FriendsRouteImport.update({
@@ -72,6 +79,11 @@ const WorldMapRoute = WorldMapRouteImport.update({
   path: '/world-map',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayWorldRoute = PlayWorldRouteImport.update({
+  id: '/play/$world',
+  path: '/play/$world',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubjectsIndexRoute = SubjectsIndexRouteImport.update({
   id: '/subjects/',
   path: '/subjects/',
@@ -85,6 +97,7 @@ const SubjectsSubjectRoute = SubjectsSubjectRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/farm': typeof FarmRoute
   '/friends': typeof FriendsRoute
   '/leaderboards': typeof LeaderboardsRoute
   '/parent': typeof ParentRoute
@@ -94,11 +107,13 @@ export interface FileRoutesByFullPath {
   '/skills': typeof SkillsRoute
   '/teacher': typeof TeacherRoute
   '/world-map': typeof WorldMapRoute
+  '/play/$world': typeof PlayWorldRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects/': typeof SubjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/farm': typeof FarmRoute
   '/friends': typeof FriendsRoute
   '/leaderboards': typeof LeaderboardsRoute
   '/parent': typeof ParentRoute
@@ -108,12 +123,14 @@ export interface FileRoutesByTo {
   '/skills': typeof SkillsRoute
   '/teacher': typeof TeacherRoute
   '/world-map': typeof WorldMapRoute
+  '/play/$world': typeof PlayWorldRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects': typeof SubjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/farm': typeof FarmRoute
   '/friends': typeof FriendsRoute
   '/leaderboards': typeof LeaderboardsRoute
   '/parent': typeof ParentRoute
@@ -123,6 +140,7 @@ export interface FileRoutesById {
   '/skills': typeof SkillsRoute
   '/teacher': typeof TeacherRoute
   '/world-map': typeof WorldMapRoute
+  '/play/$world': typeof PlayWorldRoute
   '/subjects/$subject': typeof SubjectsSubjectRoute
   '/subjects/': typeof SubjectsIndexRoute
 }
@@ -130,6 +148,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/farm'
     | '/friends'
     | '/leaderboards'
     | '/parent'
@@ -139,11 +158,13 @@ export interface FileRouteTypes {
     | '/skills'
     | '/teacher'
     | '/world-map'
+    | '/play/$world'
     | '/subjects/$subject'
     | '/subjects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/farm'
     | '/friends'
     | '/leaderboards'
     | '/parent'
@@ -153,11 +174,13 @@ export interface FileRouteTypes {
     | '/skills'
     | '/teacher'
     | '/world-map'
+    | '/play/$world'
     | '/subjects/$subject'
     | '/subjects'
   id:
     | '__root__'
     | '/'
+    | '/farm'
     | '/friends'
     | '/leaderboards'
     | '/parent'
@@ -167,12 +190,14 @@ export interface FileRouteTypes {
     | '/skills'
     | '/teacher'
     | '/world-map'
+    | '/play/$world'
     | '/subjects/$subject'
     | '/subjects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FarmRoute: typeof FarmRoute
   FriendsRoute: typeof FriendsRoute
   LeaderboardsRoute: typeof LeaderboardsRoute
   ParentRoute: typeof ParentRoute
@@ -182,6 +207,7 @@ export interface RootRouteChildren {
   SkillsRoute: typeof SkillsRoute
   TeacherRoute: typeof TeacherRoute
   WorldMapRoute: typeof WorldMapRoute
+  PlayWorldRoute: typeof PlayWorldRoute
   SubjectsSubjectRoute: typeof SubjectsSubjectRoute
   SubjectsIndexRoute: typeof SubjectsIndexRoute
 }
@@ -193,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/farm': {
+      id: '/farm'
+      path: '/farm'
+      fullPath: '/farm'
+      preLoaderRoute: typeof FarmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/friends': {
@@ -258,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorldMapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/play/$world': {
+      id: '/play/$world'
+      path: '/play/$world'
+      fullPath: '/play/$world'
+      preLoaderRoute: typeof PlayWorldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subjects/': {
       id: '/subjects/'
       path: '/subjects'
@@ -277,6 +317,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FarmRoute: FarmRoute,
   FriendsRoute: FriendsRoute,
   LeaderboardsRoute: LeaderboardsRoute,
   ParentRoute: ParentRoute,
@@ -286,6 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   SkillsRoute: SkillsRoute,
   TeacherRoute: TeacherRoute,
   WorldMapRoute: WorldMapRoute,
+  PlayWorldRoute: PlayWorldRoute,
   SubjectsSubjectRoute: SubjectsSubjectRoute,
   SubjectsIndexRoute: SubjectsIndexRoute,
 }

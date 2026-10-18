@@ -12,6 +12,11 @@ const RAW: Raw[] = [
   { bpm: 100, wave: "triangle", root: 72, scale: PENT, melody: "0 4 2 4 7 4 2 4 0 4 2 4 9 7 4 2", bass: "0 2 1 2" },
   { bpm: 68, wave: "sine", root: 60, scale: MAJ, melody: "4 - 2 - 0 - 2 - 4 - 7 - 5 - 4 -", bass: "0 4 3 4" },
   { bpm: 140, wave: "sawtooth", root: 57, scale: MPENT, melody: "0 2 3 2 0 2 4 2 3 2 0 2 4 3 2 1", bass: "0 0 2 1" },
+  { bpm: 118, wave: "triangle", root: 62, scale: PENT, melody: "0 4 2 4 7 9 7 4 2 4 0 - 2 4 7 -", bass: "0 2 1 2" },
+  { bpm: 126, wave: "triangle", root: 72, scale: MAJ, melody: "0 2 4 5 4 2 0 - 4 5 7 5 4 2 4 -", bass: "0 3 4 3" },
+  { bpm: 96, wave: "square", root: 53, scale: PHR, melody: "0 0 1 0 4 3 1 0 0 0 1 0 4 5 4 -", bass: "0 0 3 4" },
+  { bpm: 108, wave: "square", root: 55, scale: MPENT, melody: "0 2 0 3 0 4 3 2 0 2 0 3 4 3 2 -", bass: "0 0 2 3" },
+  { bpm: 120, wave: "triangle", root: 69, scale: MAJ, melody: "0 2 4 7 5 4 2 - 4 7 9 7 5 4 2 0", bass: "0 4 5 3" },
 ];
 const TR = RAW.map((t) => ({ ...t, m: t.melody.split(" "), b: t.bass.split(" ") }));
 let ctx: AudioContext | null = null, master: GainNode, timer = 0, cur = -1;
